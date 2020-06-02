@@ -14,6 +14,10 @@ PostgreSQL Interface
 #include "postgres/version.h"
 #include "storage/helper.h"
 
+// AVOID_CHECK Add include line
+#include "command/stanza/common.h"
+// AVOID_CHECK_END
+
 /***********************************************************************************************************************************
 Defines for various Postgres paths and files
 ***********************************************************************************************************************************/
@@ -497,11 +501,21 @@ pgWalFromBuffer(const Buffer *walBuffer)
     ASSERT(walBuffer != NULL);
 
     // Check that this is a long format WAL header
+    // AVOID_CHECK (1) comment out
+    /*
     if (!(((const PgWalCommon *)bufPtrConst(walBuffer))->flag & PG_WAL_LONG_HEADER))
         THROW_FMT(FormatError, "first page header in WAL file is expected to be in long format");
+    */
+    // AVOID_CHECK_END
 
     // Search for the version of PostgreSQL that uses this WAL magic
     const PgInterface *interface = NULL;
+
+    // AVOID_CHECK (2) Add three lines shown below:
+    PgControl ctl = {0};
+    ctl = pgControlFromFile(storagePg());
+    ((PgWalCommon *)bufPtrConst(walBuffer))->magic = 53505; /* dummy */
+    // AVOID_CHECK_END
 
     for (unsigned int interfaceIdx = 0; interfaceIdx < PG_INTERFACE_SIZE; interfaceIdx++)
     {
@@ -525,6 +539,11 @@ pgWalFromBuffer(const Buffer *walBuffer)
     // Get info from the control file
     PgWal result = interface->wal(bufPtrConst(walBuffer));
     result.version = interface->version;
+
+    // AVOID_CHECK (3) Add two lines shown below:
+    result.version = ctl.version;
+    result.systemId = ctl.systemId;
+    // AVOID_CHECK_END 
 
     FUNCTION_LOG_RETURN(PG_WAL, result);
 }

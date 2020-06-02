@@ -47,7 +47,9 @@ archivePushFile(
 
         // If this is a segment compare archive version and systemId to the WAL header
         if (isSegment)
-        {
+        {   
+	    // AVOID_CHECK (1) comment out
+      	    /* 
             PgWal walInfo = pgWalFromFile(walSource);
 
             if (walInfo.version != pgVersion || walInfo.systemId != pgSystemId)
@@ -58,6 +60,8 @@ archivePushFile(
                     strPtr(walSource), strPtr(pgVersionToStr(walInfo.version)), walInfo.systemId, strPtr(pgVersionToStr(pgVersion)),
                     pgSystemId);
             }
+	    */
+            // AVOID_CHECK_END
         }
 
         // Set archive destination initially to the archive file, this will be updated later for wal segments
@@ -84,6 +88,8 @@ archivePushFile(
 
                 if (strEq(walSegmentChecksum, walSegmentRepoChecksum))
                 {
+		    // AVOID_CHECK (2) comment out
+         	    /*
                     MEM_CONTEXT_PRIOR_BEGIN()
                     {
                         result = strNewFmt(
@@ -92,6 +98,8 @@ archivePushFile(
                             strPtr(archiveFile));
                     }
                     MEM_CONTEXT_PRIOR_END();
+		    */
+         	    // AVOID_CHECK_END
                 }
                 else
                     THROW_FMT(ArchiveDuplicateError, "WAL file '%s' already exists in the archive", strPtr(archiveFile));
