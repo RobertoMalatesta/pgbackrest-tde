@@ -1,0 +1,238 @@
+####################################################################################################################################
+# pgBackRest Makefile
+####################################################################################################################################
+
+####################################################################################################################################
+# List of required source files.  main.c should always be listed last and the rest in alpha order.
+####################################################################################################################################
+SRCS = \
+	command/archive/common.c \
+	command/archive/get/file.c \
+	command/archive/get/get.c \
+	command/archive/get/protocol.c \
+	command/archive/push/file.c \
+	command/archive/push/protocol.c \
+	command/archive/push/push.c \
+	command/backup/backup.c \
+	command/backup/common.c \
+	command/backup/file.c \
+	command/backup/pageChecksum.c \
+	command/check/check.c \
+	command/check/common.c \
+	command/backup/protocol.c \
+	command/expire/expire.c \
+	command/help/help.c \
+	command/info/info.c \
+	command/command.c \
+	command/control/common.c \
+	command/control/start.c \
+	command/control/stop.c \
+	command/local/local.c \
+	command/repo/create.c \
+	command/repo/get.c \
+	command/repo/ls.c \
+	command/repo/put.c \
+	command/repo/rm.c \
+	command/restore/file.c \
+	command/restore/protocol.c \
+	command/restore/restore.c \
+	command/remote/remote.c \
+	command/stanza/common.c \
+	command/stanza/create.c \
+	command/stanza/delete.c \
+	command/stanza/upgrade.c \
+	common/compress/helper.c \
+	common/compress/bz2/common.c \
+	common/compress/bz2/compress.c \
+	common/compress/bz2/decompress.c \
+	common/compress/gz/common.c \
+	common/compress/gz/compress.c \
+	common/compress/gz/decompress.c \
+	common/compress/lz4/common.c \
+	common/compress/lz4/compress.c \
+	common/compress/lz4/decompress.c \
+	common/compress/zst/common.c \
+	common/compress/zst/compress.c \
+	common/compress/zst/decompress.c \
+	common/crypto/cipherBlock.c \
+	common/crypto/common.c \
+	common/crypto/hash.c \
+	common/debug.c \
+	common/encode.c \
+	common/encode/base64.c \
+	common/error.c \
+	common/exec.c \
+	common/exit.c \
+	common/fork.c \
+	common/io/bufferRead.c \
+	common/io/bufferWrite.c \
+	common/io/filter/buffer.c \
+	common/io/filter/filter.c \
+	common/io/filter/group.c \
+	common/io/filter/sink.c \
+	common/io/filter/size.c \
+	common/io/handleRead.c \
+	common/io/handleWrite.c \
+	common/io/http/cache.c \
+	common/io/http/client.c \
+	common/io/http/common.c \
+	common/io/http/header.c \
+	common/io/http/query.c \
+	common/io/io.c \
+	common/io/read.c \
+	common/io/socket/client.c \
+	common/io/socket/common.c \
+	common/io/socket/session.c \
+	common/io/tls/client.c \
+	common/io/tls/session.c \
+	common/io/write.c \
+	common/ini.c \
+	common/lock.c \
+	common/log.c \
+	common/memContext.c \
+	common/regExp.c \
+	common/stackTrace.c \
+	common/time.c \
+	common/type/buffer.c \
+	common/type/convert.c \
+	common/type/json.c \
+	common/type/keyValue.c \
+	common/type/list.c \
+	common/type/mcv.c \
+	common/type/string.c \
+	common/type/stringList.c \
+	common/type/variant.c \
+	common/type/variantList.c \
+	common/type/xml.c \
+	common/user.c \
+	common/wait.c \
+	config/config.c \
+	config/define.c \
+	config/exec.c \
+	config/load.c \
+	config/parse.c \
+	config/protocol.c \
+	db/db.c \
+	db/helper.c \
+	db/protocol.c \
+	info/info.c \
+	info/infoArchive.c \
+	info/infoBackup.c \
+	info/manifest.c \
+	info/infoPg.c \
+	postgres/client.c \
+	postgres/interface.c \
+	postgres/interface/page.c \
+	postgres/interface/v083.c \
+	postgres/interface/v084.c \
+	postgres/interface/v090.c \
+	postgres/interface/v091.c \
+	postgres/interface/v092.c \
+	postgres/interface/v093.c \
+	postgres/interface/v094.c \
+	postgres/interface/v095.c \
+	postgres/interface/v096.c \
+	postgres/interface/v100.c \
+	postgres/interface/v110.c \
+	postgres/interface/v120.c \
+	postgres/interface/v130.c \
+	protocol/client.c \
+	protocol/command.c \
+	protocol/helper.c \
+	protocol/parallel.c \
+	protocol/parallelJob.c \
+	protocol/server.c \
+	storage/cifs/storage.c \
+	storage/posix/read.c \
+	storage/posix/storage.c \
+	storage/posix/write.c \
+	storage/remote/read.c \
+	storage/remote/protocol.c \
+	storage/remote/storage.c \
+	storage/remote/write.c \
+	storage/s3/read.c \
+	storage/s3/storage.c \
+	storage/s3/write.c \
+	storage/helper.c \
+	storage/read.c \
+	storage/storage.c \
+	storage/write.c \
+	main.c
+
+####################################################################################################################################
+# Compiler options
+####################################################################################################################################
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -I@srcdir@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+
+####################################################################################################################################
+# Directory options
+####################################################################################################################################
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+BUILDDIR=.build
+
+####################################################################################################################################
+# Create object list from source list
+####################################################################################################################################
+OBJS = $(patsubst %.c,$(BUILDDIR)/%.o,$(SRCS))
+
+####################################################################################################################################
+# Compile and link
+####################################################################################################################################
+pgbackrest: $(OBJS)
+	$(CC) -o pgbackrest $(OBJS) $(LDFLAGS) $(LIBS)
+
+####################################################################################################################################
+# Installation.  DESTDIR can be used to modify the install location.
+####################################################################################################################################
+install: pgbackrest
+	install -d $(DESTDIR)$(bindir)
+	install -m 755 pgbackrest $(DESTDIR)$(bindir)
+
+####################################################################################################################################
+# Uninstallation.  DESTDIR should be set to the same value as when installed.
+####################################################################################################################################
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/pgbackrest
+
+####################################################################################################################################
+# Clean
+####################################################################################################################################
+.PHONY = clean
+
+# Clean build files and executable created by make
+clean:
+	rm -rf $(BUILDDIR)
+	rm -f pgbackrest
+
+.PHONY = clean-all
+
+# Do clean and also remove all output from configure
+clean-all: clean
+	rm -rf autom4te.cache
+	rm -f build.auto.h config.log config.status Makefile
+
+####################################################################################################################################
+# Special per-object flags
+####################################################################################################################################
+$(BUILDDIR)/postgres/interface/page.o: CFLAGS += @CFLAGS_PAGE_CHECKSUM@
+
+####################################################################################################################################
+# Compile and generate dependencies
+####################################################################################################################################
+$(BUILDDIR)/%.o : %.c
+	@if test ! -d $(@D); then mkdir -p $(@D); fi
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $< -MMD -MP -MF $(BUILDDIR)/$*.dep
+
+# Recursive wildcard function
+rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+# Include depedency files
+DEP_FILES = $(call rwildcard,$(BUILDDIR),*.dep)
+include $(DEP_FILES)
